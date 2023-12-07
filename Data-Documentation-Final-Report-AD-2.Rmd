@@ -1,0 +1,78 @@
+# Data Documentation
+
+## Data Origins
+The data we used originates from the Uppsala University Conflict Data Program's Department 
+of Peace and Conflict Research which focuses on their Battle Deaths piece and the Yahoo 
+Finance Stock records. The Battle Deaths are based on the conflicts between two or more 
+groups and records the amount of deaths that occurred at each of these events. The Yahoo 
+Finance data is based on the freely available data from the stock trades which take 
+place at the New York Stock Exchange, one of the largest and oldest exchange centers 
+on the planet. 
+
+Links:
+
+New York Stock Exchange:
+[https://www.nyse.com/index](https://www.nyse.com/index)
+
+Uppsala Conflict Data Program:
+[https://ucdp.uu.se/downloads/](https://ucdp.uu.se/downloads/)
+
+Yahoo Finance R Package:
+[https://cran.r-project.org/web/packages/yfR/index.html](https://cran.r-project.org/web/packages/yfR/index.html)
+
+## Included Variables
+The following are the variables used in our final data set:
+
+year: The observed year.
+
+ticker.x: The ticker which corresponds to a specific company.
+
+ret_closing_prices.x: The average rate of change in the year for the company's stock.
+
+bd_best: The total number of battle deaths for that year.
+
+side_a: The main group of One side of the conflicts that occurred that year.
+
+side_a_2nd: Any other groups that were involved in the conflict on the same side as side_a.
+
+side_b: The main group opposing side_a in the conflict.
+
+side_b_2nd: Other groups that were on the side of side_b in the conflict.
+
+ticker.y: The ticker for the S&P500, the stock market index these companies are a 
+part of. 
+
+ret_closing_prices.y: The average rate of change for the S&P500 stock value that year.
+
+## Summary
+
+Overall, our data set has:
+Number of rows: 265
+Number of columns: 10
+
+The overall missing data includes:
+
+ret_closing_prices.x: 9
+
+ret_closing_prices.y: 9 (1 instance repeated 9 times)
+
+bd_best: 81 (9 years with no recorded deaths by the 9 companies)
+
+side_a: 81 (same reason as bd_best)
+
+side_a_2nd: 108
+
+side_b: 81 (same as side_a and bd_best)
+
+side_b_2nd: 251
+
+
+We should note that the large number of missing values in the 2nd side variables of both 
+sides is often the result of needing only two groups to be involved in a conflict, leaving 
+these areas empty.
+
+In addition, we are not able to have the rate of change for the first year as we
+have nothing to compare to at that point to calculate the rate of change.
+
+In 1990, from 1992 to 1998, and 2000 Uppsala did not record any battle deaths, so at any 
+point where we did not have any battle deaths, we set the number to zero. 

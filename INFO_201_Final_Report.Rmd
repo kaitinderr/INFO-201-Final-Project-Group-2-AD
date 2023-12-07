@@ -1,0 +1,272 @@
+---
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 1 Introduction
+
+We are aware that wartime can have a significant impact on the stock market. War leads to uncertainty and volatility, and resources allocated to weaponry, through connections between military companies (i.e. Raytheon RTX, Lockheed, Boeing) and the federal government are heightened. This matches the gut instinct of those who are attentive to the stock market - that stock prices of the relevant company become worryingly capricious in response to major events.
+
+This topic is very interesting as it demonstrates a stockholder’s reaction to conflict (amplified by the advent of social media), but we would like to know if the severity of a war has a further impact on these stock prices. This leads to the question: what quantifies the “severity” of a war? Is it the amount of resources (particularly, money) that quantifies? Or the amount of fatalities in the affected countries (including the U.S., if applicable)? While this is usually a deep and rich question - pragmatically, data allows us to most effectively quantify the number of fatalities. Determining which industries directly or indirectly contribute to conflict and measuring their impact on the market is indeed complex and subjective.
+
+As such, we have **sought to find if there is a positive correlation between battle-related deaths and the New York Stock Exchange growth rate of US private companies with government contracts**. We desired to find where else this correlation exists, and we did so by using battle-related deaths as a measure of wartime. Additionally, **we have decided to analyze the impact of battle deaths on the New York Stock Exchange as a whole**. In doing so, we used market indexes to represent the general stock market.
+
+Alongside searching for the correlation between battle deaths and growth rates, we hoped to **find out if companies with government contracts seemed to benefit from war profiteering**. War profiteering is defined by the unethical practice of such companies exploiting wars and other armed conflicts for financial gains. While we’re aware of the correlation equals causation fallacy, we thought that this could be a valuable insight, to see whether or not accusations of such practices are accurately reflected in the financial data. Our last goal with this project was to **find what conflict in recent times has had the largest impact on the stocks we decided to analyze**. For example, the 9/11 attacks had a noticeable impact on the market, but we wanted to find out if there have been any comparable events in the last 20 years.
+
+In regards to why someone should care to read this report, we believe younger audiences must see the impact of wartime on the economy so they are knowledgeable in the case that a serious threat presents itself in the future, as well as how US Corporations benefit at the expense of the stability of other nations and the blood of those who are non-American. We also want to generally expose corruption in the US government when it comes to politicians utilizing war as a way to advance the value of their stock market portfolio. A controversy that inspired this topic to be chosen was former Vice President Dick Cheney awarding a government contract to Halliburton, a company with whom he resigned during the 2000 presidential election but received deferred compensation during his tenure as VP. We hope that US citizens reading this report can think deeper into the motives behind military action abroad and encourage them to think about how their tax dollars are being spent. 
+
+# 2 Data
+
+### Why do we use these datasets?
+We chose to use the Uppsala Conflict Data Program’s Department of Peace and Conflict Research along with the Yahoo Finance Stock Records through the yfR library in order to find the correlations between a company's stock prices and the conflicts that happen around times of military conflict around the world. By combining financial market data with conflict information, we aim to uncover patterns that contribute to a deeper comprehension of the intricate relationship between global conflicts and the financial landscape. Such insights are most important for people such as investors, policymakers, and researchers seeking to navigate the complex interplay between geopolitical developments and financial markets. Using this collection of data points, we should be able to provide these groups of people with potential advice pertaining to what can be expected to happen when any multinational conflict occurs and provide a general plan for what they plan to do in response to any similar event. 
+
+### Where do your datasets originate from?
+Yahoo Finance collects the data it provides from the New York Stock Exchange and the Nasdaq Stock Exchange (though we only use the NYSE for the purpose of our report). The NYSE is “the world’s largest stock exchange” which provides “the guidance of experienced traders creates higher market quality for” participants. All of the information that comes from this stock exchange is some of the most extensive in the world, allowing us to get a good understanding of what many companies’ market shares were at almost any point in time relevant to us. 
+
+Credit: https://www.nyse.com/index 
+
+Much of the Uppsala Conflict Data Program’s information is aggregated from the research from “news agencies, journals, research reports, and documents of international and multinational organizations and NGOs.” All of this data provides us with a good understanding of the casualties of each conflict between nations and when might the United States have caused significant changes to the economy which may have otherwise been unseen.
+
+### Who collected the data?
+
+Uppsala is one of the oldest universities in the Nordic countries. Their goal is to “gain and disseminate knowledge for the benefit of humankind and for a better world” and “contribute to development and innovation locally and nationally and is an active party in the pursuit of sustainable social development”. This university was the one that we found that provided the most extensive information regarding international conflicts and was also one of the easier ones we found to manipulate and utilize for our findings. 
+
+Credit: https://ucdp.uu.se/
+
+Yahoo Finance is a media property that “delivers hours of live, daily market coverage, with expert analysis and real-time market data.” From our experience, this is one of the best places to find details about the sale values of various stocks thanks to their records which go back to the 1980s. This is taken from the yfR library which is an R library specializing in working with data from Yahoo Finance. 
+
+Credit: https://finance.yahoo.com/
+
+### What are the data usage permissions for this data?
+
+The data that we are using for our research is freely accessible to anyone who would like to do some of their own research as well.
+
+### What are the datasets about? What is the population and what is the sample?
+
+The data we retrieved from the UCDP Battle-related Deaths Dataset Discusses the total number of deaths from multiple different events around the world and between each country. The data set covers all over the world and any data found in terms of how many people have died as well as who each side of the conflict contained, where and when each occurred.
+
+Yahoo Finance provided us with the values of a wide variety of stock prices to publicly traded companies. Each entry represents a ticker for each company and the values of their stock at a point in time, down to the day. For our project, we chose to look at the return closing prices and observe the yearly rate of change for each of these companies.
+
+### Data Set Description
+
+* Each row represents a year, a company, the average closing price for that year, the number of battle-related deaths for that year, and every country involved in a conflict for that year.
+
+* The total number of observations made in our dataset is 265, the number of companies multiplied by the number of years we chose to observe (9).
+
+* The most relevant variables in our dataset are the rate of change in the closing price and the number of battle-related deaths.
+
+* Since we followed the rate of change, there is no growth for 1990 and there were no battle deaths recorded from 1992 to 1998. In addition, many of the conflicts only involved a singular group on one or two of the sides. This leaves many of the country-related variables with an NA value, though this does not cause any issues in our data analysis. 
+
+### Quality Issues
+
+* Our data for the conflicts (Uppsala) only goes back to 1989 and the Yahoo Finance R collection only goes a little further back. This greatly limits the total number of conflicts and stock values we are able to include and observe in our data. This also disregards several major conflicts in recent US history like the Vietnam War and the Iran War in the 1980s.
+
+* The Uppsala data goes by year purely whereas our Yahoo Finance data has each day, so in order to combine both into one data frame, we are going to essentially compress our data using the freq_data function and set it to yearly which significantly reduces the amount of data points we can look at in terms of stock tickers by a factor of about 365 (plus leap years).
+
+* Quantifying the severity of war is very difficult to account for. Different datasets may choose to arbitrarily define a ranking for severity, and battle deaths alone do not tell the whole story. We also analyze by year and some wars can take place across multiple years something I believe our Uppsala data does not account for. 
+
+* The amount of money spent being used can be observed through public government contracts, but the actions and decisions of the Department of Defense and the State as a whole can be masked through classified documents. 
+
+* Between 1992 and 1998, there were no battle deaths reported by the UCDP.
+
+# 3 Methods
+
+### Which variables did you include, and why?
+
+Both of our datasets include an extensive amount of information. In order to make our data easier to work with, we decided to select only the variables we would be utilizing in our code. Prior to selecting our necessary data, the UCDP dataset contained 25 unique variables. After considering what we needed for our program, we narrowed the dataset down to six variables: year, bd_best, side_a, side_a_2nd, side_b, and side_b_2nd. bd_best specifies the best estimate of the number of battle deaths in a conflict for that year, while the last four contain information on the nations involved in the battle. These variables enable us to merge our two datasets, analyze stocks alongside battle deaths, and filter our data. 
+
+In the Yahoo Finance data, we specifically wanted to use a variable that showed the growth of the stock whether that be positive or negative and we had to filter through various stock variables including market opens and closes, highs and lows, and eventually we landed on ret_closing_prices which gives the average return between each variable as well as the date and tickers in order to organize the data by companies and time. This essentially gives us a pseudo “rate of change” from year to year. We found this to be more useful than directly using the stock data - while direct data is indeed useful for an individual aiming to invest in the stock market, we are more interested in the dynamics.
+
+### How did you process your data, and why?
+
+In processing our data, we decided to filter the UCDP dataset such that it contains information only on conflicts where the United States is involved. We believed this would yield better results for impacts on the New York Stock Exchange, and it also enabled us to prune what would have been a dataset with over 1000 rows. If we were to include conflicts where the United States is not involved, it may skew results. Additionally, we had to address the issue of there being multiple conflicts in a single year. This would cause issues in the merging process, so in order to address this, we grouped the rows by year and summed battle deaths. Regarding the yfR dataset, there was minimal processing we had to do. The library allows you to simply select the data for whatever ticker you want, so there is no cleaning required. Lastly, we decided to join the two tables using year as the merge key.
+
+### How did you select your sample?
+
+Our sample was selected by collecting the tickers, or stock symbols, of 9 of the largest defense-related companies along with the S&P500 market index. Considering how we are analyzing the correlation between stocks and battle conflicts, it made the most sense to analyze the impact on defense-related companies, as there is the possibility that their goods and services are involved in the conflict.
+
+### Technical Decisions
+
+There was one main technical decision that was made. After filtering our UCDP dataset, there were some years where the United States had no recorded conflicts. For example, there were no rows of data for the years ranging from 1992 and 1998. This would cause merging and plotting issues, so to address this, we added new rows for the year and set the number of battle deaths to 0.
+
+```{r}
+library(tidyverse)
+library(yfR)
+```
+
+```{r}
+# retrieve battle-related deaths for wars that involve the U.S.
+brd <- read_delim("../data/ucdp-brd-conf-231-csv.zip")
+brd <- brd %>% 
+  select(year, bd_best, side_a, side_a_2nd, side_b, side_b_2nd)
+
+brd <- brd %>% 
+  filter(grepl("Government of United States of America", side_a, fixed = TRUE) |
+           grepl("Government of United States of America", side_a_2nd, fixed = TRUE) |
+           grepl("Government of United States of America", side_b, fixed = TRUE) |
+           grepl("Government of United States of America", side_b_2nd, fixed = TRUE)) %>% 
+  arrange(year) 
+
+range_years <- seq(min(brd$year), max(brd$year), by = 1)
+
+brd <- brd %>% 
+  complete(year = range_years, fill = list(bd_best = 0)) %>% 
+  group_by(year) %>% 
+  mutate(bd_best = sum(bd_best)) %>% 
+  distinct(year, .keep_all = TRUE)
+```
+```{r}
+# get stock info for select defense companies
+def_stocks <- yf_get(c("BA", "RTX", "LMT", "NOC", "GD", "TDG", "LHX", "TDG", "HEI", "SPR"), first_date = 
+"1990-01-01", last_date = Sys.Date(), freq_data = "yearly", thresh_bad_data = 0.45)
+def_stocks$year <- as.integer(format(def_stocks$ref_date, "%Y"))
+# 1. BA: Boeing Company
+# 2. RTX: RTX
+# 3. LMT: Lockheed Martin
+# 4. NOC: Northrop Grumman
+# 5. GD: General Dynamics
+# 6. TDG: Transdigm Group
+# 7. LHX: L3Harris Technologies
+# 8. AXON: Axon
+# 9. HEI: HEICO Corp.
+# 10. SPR: Spirit AeroSystems
+def_stocks <- def_stocks %>% select(year, ticker, ret_closing_prices)
+```
+
+```{r}
+# create dataframe for average change in stock value per year of all the defense companies
+avg_yearly_def_stocks_change <- def_stocks %>%
+  group_by(year) %>%
+  summarise(average_ret_closing_prices = mean(ret_closing_prices, na.rm = TRUE))
+```
+
+```{r}
+# do the same for the ^GSPC ticker (respresenting the general state of the economy)
+gspc_stocks <- yf_get(("^GSPC"), first_date = "1990-01-01", last_date = Sys.Date(), freq_data = "yearly")
+gspc_stocks$year <- as.integer(format(gspc_stocks$ref_date, "%Y"))
+gspc_stocks <- gspc_stocks %>% select(year, ticker, ret_closing_prices)
+```
+
+```{r}
+# merge battle deaths and defense stocks, gspc stocks, and averaged defense stocks
+merged_brd_def_stocks <- inner_join(def_stocks, brd, by = "year")
+merged_brd_def_stocks <- inner_join(merged_brd_def_stocks, gspc_stocks, by = "year")
+merged_brd_def_avg_stocks <- inner_join(avg_yearly_def_stocks_change, brd, by = "year")
+merged_brd_def_avg_stocks <- inner_join(merged_brd_def_avg_stocks, gspc_stocks, by = "year")
+```
+
+# 4 Results
+
+The results yielded from our program provide some interesting insight into the relationship between the number of battle deaths and the growth rate of different stock prices. As we look at the figures, note that between 1992 and 1998, there were no recorded battle deaths in the UCDP dataset.
+
+```{r}
+Northrop_data <- merged_brd_def_stocks %>%
+  filter(ticker.x == "NOC")
+ggplot(Northrop_data, aes(x = factor(year), y = ret_closing_prices.x, fill = bd_best)) +
+  geom_bar(stat = "identity", position = "dodge", na.rm = TRUE) +
+  scale_fill_viridis_c(name = "Battle Deaths", option = "plasma") +
+  labs(title = paste("Northrop Grumman Stock Performance vs. Battle Deaths"),
+       x = "Year",
+       y = "Rate of Change in Stock Prices") +
+  theme_minimal() + 
+  scale_x_discrete(breaks = seq(min(merged_brd_def_avg_stocks$year), max(merged_brd_def_avg_stocks$year), by = 5))
+```
+
+The plot to above depicts the relationship between battle deaths and Northrop Grumman’s growth rate from 1991 to 2022. This plot tells us that for this company specifically, there appears to be somewhat of a correlation between battle deaths and the stock’s growth rate which is mainly seen in the period from 2014-2021. Northrop Grumman is primarily experiencing growth during this time, and we see the same trend in 1991.
+
+```{r}
+boeing_data <- merged_brd_def_stocks %>%
+  filter(ticker.x == "BA")
+ggplot(boeing_data, aes(x = factor(year), y = ret_closing_prices.x, fill = bd_best)) +
+  geom_bar(stat = "identity", position = "dodge", na.rm = TRUE) +
+  scale_fill_viridis_c(name = "Battle Deaths", option = "plasma") +
+  labs(title = paste("Boeing Stock Performance vs. Battle Deaths"),
+       x = "Year",
+       y = "Rate of Change in Stock Prices") +
+  theme_minimal() + 
+  scale_x_discrete(breaks = seq(min(merged_brd_def_avg_stocks$year), max(merged_brd_def_avg_stocks$year), by = 5))
+```
+
+These results, however, are not seen across the board. As we look at Boeing’s stock performance, there is minimal growth in the 2014-2021 timespan, and the growth rate in 1991 is not nearly as high as it is in the Northrop Grumman plot. For Boeing, there tends to be more growth in the time period spanning from 2001 to 2013. Because of these varying results, it is important to plot averages amongst all defense tickers we selected.
+
+```{r}
+ggplot(merged_brd_def_avg_stocks, aes(x = factor(year), y = average_ret_closing_prices, fill = bd_best)) +
+  geom_bar(stat = "identity", position = "dodge", na.rm = TRUE) +
+  scale_fill_viridis_c(name = "Battle Deaths", option = "plasma") +
+  labs(title = paste("Average Defense Company Stock Performance vs. Battle Deaths"),
+       x = "Year",
+       y = "Rate of Change in Stock Prices") +
+  theme_minimal() + 
+  scale_x_discrete(breaks = seq(min(merged_brd_def_avg_stocks$year), max(merged_brd_def_avg_stocks$year), by = 5))
+```
+
+This next plot shows the relationship between battle deaths and the **average** defense stock rate of change. Observing the period from 2003 to now, it appears that battle deaths have minimal impact on the growth rate of stocks. Regardless of how low or how high the number of deaths is, the rate of change remains around the same barring some exceptions caused by other factors. The plots we have been observing so far, however, have all been defense-related. In order to get a baseline to compare, we can look at the relationship for the S&P 500 market index.
+
+```{r}
+ggplot(merged_brd_def_avg_stocks, aes(x = factor(year), y = ret_closing_prices, fill = bd_best)) +
+  geom_bar(stat = "identity", position = "dodge", na.rm = TRUE) +
+  scale_fill_viridis_c(name = "Battle Deaths", option = "plasma") +
+  labs(title = paste("S&P 500 Stock Performance vs. Battle Deaths"),
+       x = "Year",
+       y = "Rate of Change in Stock Prices") +
+  theme_minimal() + 
+  scale_x_discrete(breaks = seq(min(merged_brd_def_avg_stocks$year), max(merged_brd_def_avg_stocks$year), by = 5))
+```
+
+We are using the S&P 500 to measure the general stock performance of the market. When comparing this with the average defense-related company’s performance, there is little difference. A positive rate of change can be seen in most of the last 7 years, but we don’t believe this can be attributed to the higher death toll, as the same positive growth can be seen at lower death tolls.
+
+# 5 Findings Discussion
+
+As per our results, we cannot say there is not a clear correlation between battle deaths and defense stocks as during years with significantly more deaths we do not see a substantial difference between chosen defense contractors and market indexes that would imply a correlation in either direction. Our initial hypothesis claimed there would be a positive correlation between war and the defense industry stocks, to the extent that they would outperform regular market indexes in times of war. Given that we were not able to analyze data from World War II, the Vietnam War, and other US predicaments, we would argue that claiming the null hypothesis would be invalid because the time period we are analyzing is too narrow in US history. However, regarding our initial question, we can confidently conclude that there is no obvious takeaway concerning the battle deaths of US-involved wars and the stock indexes of US defense contractors. If any specific event had the most impact it seemed the initial War on Terror throughout the early 2000s seemed to have the biggest time in catapulting defense contractors forward as we saw the biggest jump. However, looking through our dataset there seems to be a lot of untold stories that our group had not heard of before like the civil war in Mali. We believe there is injustice aided by the US government that the media chooses to not talk about and stories of war that are slipped under the rug of the average US citizen's media consumption. For those who want to expand upon our work and look into similar topics to analyze, I would recommend finding more datasets, potentially those locked behind paywalls that contain more concrete information. On top of that, data that extends back in time so potentially different stock data that includes data back to the 1960s with the Vietnam War. Another set of data that could be useful is to actually analyze a list of specific US contracts and see which companies were awarded, and how big those contracts were. Doing this would provide insight into the business dealings between private companies and the Department of Defense, and how certain individuals profited off of the bloodshed of others, such as the aftermath of the infamous Afghan deal. 
+
+# 6 Summary
+
+All in all, we set out to find any correlation between the number of deaths due to conflicts around the world in which the United States is involved and what effect that has on the companies in the country. To do so, we chose to represent a company’s growth through their average growth over each year when compared to the total number of battle deaths for that year, focusing on the conflicts in which the US was involved according to the UCDP. After looking at the S&P500 and nine of the top companies that have defense-related contracts with the United States average stock growth for that year, our group found some interesting results. From our results, we found that for some companies, such as Northrop Grumman, there was some correlation between the number of battle deaths and the effect of their stock changes. But for the rest of our companies, they did not reflect any similar change with some, like Boeing, showing a negative lowering based on the larger number of battle deaths. We are interested to see how much the data may reveal when we are given a larger time to work with. Because the data only went back to 1989 for the UCDP data, we could only focus more on the more recent conflicts, many of which do not have large battle death counts possibly as a result of the advancements in technology making conflicts shorter and less costly for human lives. If we were to reiterate this experiment, we may want to focus on alternative costs such as the monetary expenses of these wars for a country, a larger time frame than just back to 1989, or the duration of these conflicts to possibly find some other kind of correlation in war and the economy. 
+
+
+
+
+
+
+Below are extra plots for defense-related companies that were not included in our results section:
+```{r}
+RTX_data <- merged_brd_def_stocks %>%
+  filter(ticker.x == "RTX")
+ggplot(RTX_data, aes(x = factor(year), y = ret_closing_prices.x, fill = bd_best)) +
+  geom_bar(stat = "identity", position = "dodge", na.rm = TRUE) +
+  scale_fill_viridis_c(name = "Battle Deaths", option = "plasma") +
+  labs(title = paste("RTX Stock Performance vs. Battle Deaths"),
+       x = "Year",
+       y = "Rate of Change in Stock Prices") +
+  theme_minimal() + 
+  scale_x_discrete(breaks = seq(min(merged_brd_def_avg_stocks$year), max(merged_brd_def_avg_stocks$year), by = 5))
+```
+
+```{r}
+Lockheed_data <- merged_brd_def_stocks %>%
+  filter(ticker.x == "LMT")
+ggplot(Lockheed_data, aes(x = factor(year), y = ret_closing_prices.x, fill = bd_best)) +
+  geom_bar(stat = "identity", position = "dodge", na.rm = TRUE) +
+  scale_fill_viridis_c(name = "Battle Deaths", option = "plasma") +
+  labs(title = paste("Lockheed Stock Performance vs. Battle Deaths"),
+       x = "Year",
+       y = "Rate of Change in Stock Prices") +
+  theme_minimal() + 
+  scale_x_discrete(breaks = seq(min(merged_brd_def_avg_stocks$year), max(merged_brd_def_avg_stocks$year), by = 5))
+```
+
+```{r}
+General_Dyn_data <- merged_brd_def_stocks %>%
+  filter(ticker.x == "GD")
+ggplot(General_Dyn_data, aes(x = factor(year), y = ret_closing_prices.x, fill = bd_best)) +
+  geom_bar(stat = "identity", position = "dodge", na.rm = TRUE) +
+  scale_fill_viridis_c(name = "Battle Deaths", option = "plasma") +
+  labs(title = paste("General Dynamics Stock Performance vs. Battle Deaths"),
+       x = "Year",
+       y = "Rate of Change in Stock Prices") +
+  theme_minimal() + 
+  scale_x_discrete(breaks = seq(min(merged_brd_def_avg_stocks$year), max(merged_brd_def_avg_stocks$year), by = 5))
+```
